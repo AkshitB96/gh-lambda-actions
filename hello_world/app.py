@@ -50,9 +50,10 @@ def lambda_handler(event, context):
         
         try:
             key_name_space = keyName.replace("+"," ")
-            key_path_name = keyName.lower().replace(" ","").split("-")[0]
+            key_path_name = keyName.lower().split("-")[0]
+            key_path_name_parquet = keyName.lower().replace(" ","").split("-")[0]
             key_name = key_path_name.split("/")[2].replace("+"," ")
-            keyname_parquet = "{kn}/{ds}/{ts}.parquet".format(ds=datestamp, ts=timestamp, kn = key_path_name)
+            keyname_parquet = "{kn}/{ds}/{ts}.parquet".format(ds=datestamp, ts=timestamp, kn = key_path_name_parquet)
             
             log.info('%s partner name passed to query',key_name)
         except Exception as e:
