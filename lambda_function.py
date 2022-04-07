@@ -8,93 +8,100 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 import io
+from io import StringIO
+from io import BytesIO
+import mysql.connector
+from mysql.connector import Error
 
-s3 = boto3.client('s3')
+try:
+    mydb = mysql.connector.connect(
+    host="aapop8rg6szuzt.cfcfombhbl6n.ap-south-1.rds.amazonaws.com",
+    user="onecode",
+    password="Asdx#123",
+    database="ebdb" 
+    )
+    print("MySQL Database connection successful")
+except Error as err:
+    print(f"Error: '{err}'")
 
-def lambda_handler(event, context):
-    
-    datestamp = dt.datetime.now().strftime("%Y/%m/%d")
-    timestamp = dt.datetime.now().strftime("%s")
-    
-    filename_json = "/tmp/file_{ts}.json".format(ts=timestamp)
-    filename_csv = "/tmp/file_{ts}.csv".format(ts=timestamp)
-    keyname_parquet = "{ts}.parquet".format(ds=datestamp, ts=timestamp)
-    keyname_s3 = "{ts}.json".format(ds=datestamp, ts=timestamp)
-    
-    json_data = []
-    uid = []
-    today = dt.datetime.now().strftime("%x")
-    new_bucket_name = "emaildatajson"
 
-    for record in event['Records']:
-        bucket_name = record['s3']['bucket']['name']
-        key_name = record['s3']['object']['key']
+
+# print(mydb)
+
+# cur = mydb.cursor()
+
+# cur.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'ebdb'")
+
+# for table in [tables[0] for tables in cur.fetchall()]:
+#     print(table)
+
+# s3 = boto3.client('s3')
+# s3_resource = boto3.resource('s3')
+
+# def lambda_handler(event, context):
+    
+datestamp = dt.datetime.now().strftime("%Y/%m/%d")
+timestamp = dt.datetime.now().strftime("%s")
+    
+#     try:
+#         for record in event['Records']:
+#             bucket_name = record['s3']['bucket']['name']
+#             keyName = record['s3']['object']['key']
+#     except Exception:
+#         raise Exception
         
-    s3_object = s3.get_object(Bucket=bucket_name, Key=key_name)
-    data = s3_object['Body'].read()
-    contents = data.decode('utf-8')
-    
-    # resp = s3.get_object(Bucket=bucket_name, Key=key_name)
-    # data = resp['Body'].read().decode('utf-8')
-    
-    # df = pd.read_csv(s3_object)
-    # print(df.to_parquet())
-    
-    # # df = pd.read_csv(list(reader(data)))
-    # print(data)
-    
-   
-    
-    with open(filename_csv, 'a') as csv_data:
-        csv_data.write(contents)
-        # print(contents)
-    
-    with open(filename_csv) as csv_data:
-        csv_reader = csv.DictReader(csv_data)
-        for csv_row in csv_reader:
-            json_data.append(csv_row)
-            uid.append(csv_row['Number'])
-           
-    
-    i = 0
-    
-    with open(filename_json, 'w') as json_file:
-        json_file.write(json.dumps(json_data))
-        
-        df = pd.DataFrame({'Partner_Name': key_name,
-                      			'Date': today,
-                        		'UID': uid,
-                                'Data': json_data
-        })
-       
-        # print(uid)
-    
-    
-    # with open(filename_json, 'r') as json_file_contents:
-    #     response = s3.put_object(Bucket=new_bucket_name, Key=keyname_s3, Body=json_file_contents.read())
-        
-    """ Write a dataframe to a Parquet on S3 """
-    # print("Writing {} records to {}".format(len(df), filename))
-    output_file = f"s3://{new_bucket_name}/{keyname_parquet}"
-    # df.to_parquet(output_file)
-    
-    table = pa.Table.from_pandas(df)
-    pq.write_table(table, output_file, compression='snappy')
-    
-    # buffer = io.BytesIO()
-    # s = boto3.resource('s3')
-    # object = s.Object('emaildatajson','1648106453.parquet')
-    # object.download_fileobj(buffer)
-    # dr = pd.read_parquet(buffer)
+csv_fileName = "Paytm Money_Report - sheet 1.csv"
+partnerID = ""
+pcategories = []
+partnerName = csv_fileName.split("_")[0]
 
-    # print(dr.head())
-    
-    os.remove(filename_csv)
-    os.remove(filename_json)
-    
-    # print(df)
+# print("SELECT id FROM partner WHERE fullname = %s",(partnerName))
+mycursor = mydb.cursor()
+pIDQuery = """SELECT id FROM partner WHERE fullname=%s"""
+partnerName = (partnerName,)
+mycursor.execute(pIDQuery,partnerName)
+partnerID = mycursor.fetchall()
 
-    return {
-        'statusCode': 200,
-        'body': json.dumps('CSV converted to Parquet and available at: {bucket}/{key}'.format(bucket=new_bucket_name,key=keyname_parquet))
-    }
+
+
+# partnerID = mydb.ebdb
+
+
+
+
+#     key_name_space = keyName.replace("+"," ")
+#     key_name = keyName.lower().replace(" ","").split("-")[0]
+
+#     keyname_parquet = "{kn}/{ds}/{ts}.parquet".format(ds=datestamp, ts=timestamp, kn = key_name)
+    
+#     uid = []
+    
+#     today = dt.datetime.now().strftime("%Y/%m/%d")
+#     new_bucket_name = "emaildatajson"
+    
+#     obj = s3.get_object(Bucket=bucket_name, Key=key_name_space)
+#     data = pd.read_csv(obj['Body'])
+    
+#     js = data.to_json(orient='records', lines=True).splitlines()
+    
+    
+#     uid = pd.DataFrame(data)
+    
+#     df = pd.DataFrame({
+#         'data' : js,
+#         'Partner_Name' : key_name,
+#         'Date' : today
+#     })
+
+#     df["UID"] = uid.Mobile
+    
+#     output_file = f"s3://{new_bucket_name}/{keyname_parquet}"
+#     table = pa.Table.from_pandas(df)
+#     pq.write_table(table, output_file, compression='snappy')
+    
+#     print('CSV converted to Parquet and available at: {bucket}/{key}'.format(bucket=new_bucket_name,key=keyname_parquet))
+
+#     return {
+#         'statusCode': 200,
+#         'body': json.dumps('CSV converted to Parquet and available at: {bucket}/{key}'.format(bucket=new_bucket_name,key=keyname_parquet))
+#     }
