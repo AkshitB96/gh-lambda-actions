@@ -9,8 +9,8 @@ Description: >
 Globals:
   Function:
     Timeout: 60
-    Memory: 3000
-    Ephemeral storage: 6000
+    MemorySize: 3000
+    EphemeralStorage: 6000
 
 Resources:
   HelloWorldFunction:
