@@ -1,9 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  lambda-gh-action
+  oc-data-lambda-csv2parquet
 
-  Sample SAM Template for lambda-gh-action
+
+  Sample SAM Template for oc-data-lambda-csv2parquet
+
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
@@ -12,31 +14,31 @@ Globals:
     MemorySize: 3000
 
 Resources:
-  HelloWorldFunction:
+  ocDataLambdaCsv2ParquetFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: hello_world/
+      CodeUri: oc-data-lambda-csv2parquet/
       Handler: app.lambda_handler
       Runtime: python3.8
       Architectures:
         - x86_64
       Events:
-        HelloWorld:
+        ocDataLambdaCsv2Parquet:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /hello
+            Path: /index
             Method: get
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  HelloWorldApi:
-    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  HelloWorldFunction:
-    Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+  ocDataLambdaCsv2ParquetApi:
+    Description: "API Gateway endpoint URL for Prod stage for ocDataLambdaCsv2Parquet function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/index/"
+  ocDataLambdaCsv2ParquetFunction:
+    Description: "ocDataLambdaCsv2Parquet Lambda Function ARN"
+    Value: !GetAtt ocDataLambdaCsv2ParquetFunction.Arn
+  ocDataLambdaCsv2ParquetFunctionIamRole:
+    Description: "Implicit IAM Role created for ocDataLambdaCsv2Parquet function"
+    Value: !GetAtt ocDataLambdaCsv2ParquetFunctionRole.Arn

@@ -34,7 +34,7 @@ def lambda_handler(event, context):
             conn = db.mydb
             log.info('connected to db')
         except Exception as e:
-            print(e)
+            log.error(e)
             raise Exception("Connection Not established with DB");
             
             
@@ -45,7 +45,7 @@ def lambda_handler(event, context):
                 keyName = record['s3']['object']['key']
                 log.info('%s is being processed',keyName)
         except Exception as e:
-            print(e)
+            log.error("For file %s error is %s",keyName,e)
             raise Exception("Failed to get Bucket or File name")
         
         try:
@@ -57,7 +57,7 @@ def lambda_handler(event, context):
             
             log.info('%s partner name passed to query',key_name)
         except Exception as e:
-            print(e)
+            log.error("For file %s error is %s",keyName,e)
             raise Exception('Failed to get proper filenames for %s where these are file names %s --> %s --> %s',keyName,key_name_space,key_path_name,key_name)
         
         # Query to get Partner ID by Name
@@ -71,7 +71,7 @@ def lambda_handler(event, context):
             partnerID = pID[0][0]
             log.info('partner id is %s for the file %s',partnerID,keyName)
         except Exception as e:
-            print(e)
+            log.error("For file %s error is %s",keyName,e)
             raise Exception("Fail to get partner ID")
         
         # query to get unique column for csv from partner meta data
@@ -86,7 +86,7 @@ def lambda_handler(event, context):
             uniqueAttrCode = partnerMetaData[0][1]
             log.info('Unique col name and code %s, %s for file %s',csvUniqueColName,uniqueAttrCode,keyName)
         except Exception as e:
-            print(e)
+            log.error("For file %s error is %s",keyName,e)
             raise Exception("Fail to get unique column name")
         
         # get csv data and to json
@@ -134,7 +134,7 @@ def lambda_handler(event, context):
                     else:
                         print('Not specified query for the partner')
                 except Exception as e:
-                    print(e)
+                    log.error("For file %s error is %s",keyName,e)
                     raise Exception("Unable to get cx_id and user_id")
                     
                 try:
@@ -157,12 +157,12 @@ def lambda_handler(event, context):
                     fda = pd.merge(df,dg,how = 'outer', on = 'UID')
                     chunk_list.append(fda)
                 except Exception as e:
-                    print(e)
+                    log.error("For file %s error is %s",keyName,e)
                     raise Exception("Failed to write to dataframe")
             log.info('got chunk data for file %s',keyName)
             log.info('dataframe created for the file %s',keyName)
         except Exception as e:
-            print(e)
+            log.error("For file %s error is %s",keyName,e)
             raise Exception("Fail to convert to JSON")
         df_concat = pd.concat(chunk_list)
 
@@ -176,17 +176,18 @@ def lambda_handler(event, context):
             pq.write_table(table, output_file, compression='snappy')
             log.info('Output parquet file %s written for %s',output_file,keyName)
         except Exception as e:
-            print(e)
+            log.error("For file %s error is %s",keyName,e)
             raise Exception("fail to write parquet file to s3 bucket")
         
         print('CSV converted to Parquet and available at: {bucket}/{key}'.format(bucket=new_bucket_name,key=keyname_parquet))
+        
         return {
             'statusCode': 200,
             'body': json.dumps('CSV converted to Parquet and available at: {bucket}/{key}'.format(bucket=new_bucket_name,key=keyname_parquet))
         }  
     except Exception as e:
-        print(e)
+        log.error("For file %s error is %s",keyName,e)
         return {
             'statusCode': 500,
             'body': "internal server error"
-        }
+        } 
