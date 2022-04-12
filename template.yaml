@@ -39,6 +39,6 @@ Outputs:
   ocDataLambdaCsv2ParquetFunction:
     Description: "ocDataLambdaCsv2Parquet Lambda Function ARN"
     Value: !GetAtt ocDataLambdaCsv2ParquetFunction.Arn
-  ocDataLambdaCsv2ParquetFunctionIamRole:
-    Description: "Implicit IAM Role created for ocDataLambdaCsv2Parquet function"
-    Value: !GetAtt ocDataLambdaCsv2ParquetFunctionRole.Arn
+  # ocDataLambdaCsv2ParquetFunctionIamRole:
+  #   Description: "Implicit IAM Role created for ocDataLambdaCsv2Parquet function"
+  #   Value: !GetAtt ocDataLambdaCsv2ParquetFunctionRole.Arn
