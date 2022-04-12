@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from ocDataLambdaCsv2Parquet import app
+from hello_world import app
 
 
 @pytest.fixture()
