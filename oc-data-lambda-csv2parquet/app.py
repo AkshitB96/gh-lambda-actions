@@ -8,7 +8,6 @@ from lib import db_config as db
 import numpy as np
 import logging
 
-
 # setting up logger
 log = logging.getLogger()
 log.setLevel(logging.INFO)
